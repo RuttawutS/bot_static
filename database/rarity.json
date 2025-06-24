@@ -1,0 +1,13 @@
+[
+  { "code": "CBR", "name": "Card Board Rare" },
+  { "code": "COM", "name": "Common" },
+  { "code": "CMP", "name": "Common Promo" },
+  { "code": "PPR", "name": "Paper Rare" },
+  { "code": "RAR", "name": "Rare" },
+  { "code": "SEC", "name": "Secret" },
+  { "code": "SCR", "name": "Secret Rare" },
+  { "code": "SPR", "name": "Super Rare" },
+  { "code": "SPP", "name": "Super Rare Promo" },
+  { "code": "ULT", "name": "Ultra Rare" },
+  { "code": "N", "name": "ไม่มี" }
+]

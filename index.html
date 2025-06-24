@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battle of Talingchan - Database</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <aside id="sidebar">
+    <div class="sidebar-header">
+      <h2>ตัวกรองการ์ด</h2>
+      <input type="text" id="searchInput" placeholder="ค้นหาชื่อการ์ด..." class="text-input">
+    </div>
+
+    <div class="filter-group">
+      <label for="typeFilter">Type:</label>
+      <select class="select" id="typeFilter" data-placeholder="Type">
+        <option value="">-- เลือก Type --</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="symbolFilter">Symbol:</label>
+      <select class="select" id="symbolFilter" data-placeholder="Symbol">
+        <option value="">-- เลือก Symbol --</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="costFilter">Cost:</label>
+      <select class="select" id="costFilter" data-placeholder="Cost">
+        <option value="">-- เลือก Cost --</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="cardColorFilter">Card Color:</label>
+      <select class="select" id="cardColorFilter" data-placeholder="Card Color">
+        <option value="">-- เลือก Card Color --</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="gemFilter">Gem:</label>
+      <select class="select" id="gemFilter" data-placeholder="Gem">
+        <option value="">-- เลือก Gem --</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="gemColorFilter">Gem Color:</label>
+      <select class="select" id="gemColorFilter" data-placeholder="Gem Color">
+        <option value="">-- เลือก Gem Color --</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="powerFilter">Power:</label>
+      <select class="select" id="powerFilter" data-placeholder="Power">
+        <option value="">-- เลือก Power --</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="isOnlyOneFilter">Is Only One:</label>
+      <select class="select" id="isOnlyOneFilter" data-placeholder="IsOnlyOne">
+        <option value="">-- เลือก only one --</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="rarityFilter">Rarity:</label>
+      <select class="select" id="rarityFilter" data-placeholder="Rarity">
+        <option value="">-- เลือก Rarity --</option>
+      </select>
+    </div>
+
+    <button id="resetBtn" class="action-button">รีเซ็ตตัวกรอง</button>
+  </aside>
+
+  <div id="main-content">
+    <h1>BOT.DB</h1>
+    <div id="card-container"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

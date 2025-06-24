@@ -1,0 +1,269 @@
+body {
+  font-family: 'Kanit', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* ใช้ Kanit เป็นหลัก */
+  background: #f0f2f5; /* Very light grey/blue background */
+  color: #333; /* Darker text color for readability on light background */
+  line-height: 1.6;
+  margin: 0;
+  display: flex; /* ใช้ Flexbox สำหรับ layout หลัก */
+  min-height: 100vh;
+}
+
+/* Sidebar Styling */
+#sidebar {
+  width: 280px; /* ความกว้างของ Sidebar */
+  background: #ffffff; /* White background */
+  padding: 30px 20px;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.08); /* Shadow ทางขวา */
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* ระยะห่างระหว่างกลุ่มฟิลเตอร์ */
+  position: sticky; /* ทำให้ sidebar อยู่กับที่เมื่อ scroll */
+  top: 0;
+  align-items: stretch; /* ทำให้ items ยืดเต็มความกว้าง */
+  overflow-y: auto; /* เพิ่ม scrollbar ถ้าเนื้อหาเกิน */
+}
+
+.sidebar-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.sidebar-header h2 {
+  color: #2c3e50;
+  font-size: 1.8em;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 10px;
+}
+
+/* Main Content Area */
+#main-content {
+  flex-grow: 1; /* ให้ Main Content ใช้พื้นที่ที่เหลือทั้งหมด */
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden; /* ป้องกัน horizontal scroll */
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #2c3e50; /* Dark blue/grey heading color */
+  font-size: 3em; /* เพิ่มขนาดหัวข้อ */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Subtle text shadow */
+  letter-spacing: 1px;
+}
+
+/* Filter Form - ภายใน Sidebar */
+#filter-form { /* ID นี้อาจไม่จำเป็นแล้วถ้าฟิลเตอร์อยู่นอก form */
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.filter-group {
+    margin-bottom: 15px;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #555;
+    font-size: 0.95em;
+}
+
+.select, .text-input {
+  width: 100%; /* ทำให้เต็มความกว้างของ Sidebar */
+  padding: 12px 15px;
+  font-size: 1em;
+  border-radius: 8px;
+  border: 1px solid #cccccc; /* Soft border color */
+  background-color: #ffffff; /* White background for select boxes */
+  color: #555; /* Neutral text for select boxes */
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20256%20256%22%3E%3Cpath%20fill%3D%22%237f8c8d%22%20d%3D%22M208%2096H48c-8.8%200-16%207.2-16%2016v160c0%208.8%207.2%2016%2016%2016h160c8.8%200%2016-7.2%2016-16V112c0-8.8-7.2-16-16-16zm-80%2096L96%20160h64l-32%2032z%22%2F%3E%3C%2Fsvg%3E'); /* Custom arrow color adjusted */
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 1em;
+  padding-right: 30px;
+  cursor: pointer;
+  box-sizing: border-box; /* สำคัญเพื่อให้ padding ไม่เกิน width */
+}
+
+.select:focus, .text-input:focus {
+  outline: none;
+  border-color: #007bff; /* Primary blue highlight on focus */
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.text-input {
+    margin-bottom: 20px;
+    margin-top: 10px;
+}
+
+/* Action Buttons */
+.action-button {
+  padding: 12px 25px;
+  font-size: 1.1em;
+  background-color: #007bff; /* A standard blue for action */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%; /* ทำให้ปุ่มเต็มความกว้าง */
+  margin-top: 10px;
+}
+
+.action-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+#card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+  width: 100%;
+  max-width: 1200px;
+  margin-top: 20px; /* ระยะห่างจากหัวข้อ */
+}
+
+.card {
+  background: #ffffff; /* White background for cards */
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Lighter shadow */
+  padding: 25px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  color: #333; /* Darker text for card content */
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e0e0e0; /* Light border for cards */
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px; /* เพิ่มความหนาของ accent bar */
+  background: linear-gradient(to right, #007bff, #17a2b8); /* Blue/teal gradient accent */
+}
+
+.card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.18); /* Slightly more intense shadow on hover */
+}
+
+.card h3 {
+  margin-top: 10px;
+  margin-bottom: 15px;
+  color: #2c3e50;
+  font-size: 1.6em; /* ปรับขนาดหัวข้อใน card */
+  border-bottom: 2px solid #f0f2f5; /* Lighter separator */
+  padding-bottom: 10px;
+}
+
+.card .label {
+  font-weight: 700;
+  color: #777; /* Neutral grey for labels */
+  margin-right: 5px;
+}
+
+.card .row {
+  margin: 10px 0;
+  font-size: 0.95em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* จัดหัวข้อและ #1 ให้แยกกัน */
+}
+
+.card .row h3:last-child {
+    font-size: 0.8em; /* ขนาดเล็กสำหรับ #1 */
+    color: #999;
+}
+
+.no-results {
+    text-align: center;
+    color: #888;
+    font-size: 1.2em;
+    padding: 50px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  body {
+    flex-direction: column; /* เปลี่ยน Sidebar เป็น Top bar */
+  }
+
+  #sidebar {
+    width: 100%;
+    position: static; /* ไม่ติดหนึบ */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08); /* Shadow ด้านล่าง */
+    padding: 20px;
+    gap: 5px; /* ลด gap เมื่อเป็นคอลัมน์ */
+  }
+
+  .sidebar-header {
+      margin-bottom: 0;
+  }
+
+  .sidebar-header h2 {
+      display: none; /* ซ่อนหัวข้อตัวกรองเมื่อเป็น mobile */
+  }
+
+  #searchInput {
+      margin-top: 0;
+      margin-bottom: 5px;
+  }
+
+  .filter-group {
+      margin-bottom: 2px;
+  }
+
+  #main-content {
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 2.5em;
+  }
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2em;
+  }
+
+  #card-container {
+    grid-template-columns: 1fr;
+  }
+
+  .select,
+  .text-input,
+  .action-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 20px;
+  }
+
+  .card h3 {
+    font-size: 1.3em;
+  }
+
+  #sidebar {
+      padding: 15px;
+  }
+}
