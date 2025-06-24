@@ -1,8 +1,0 @@
-[
-  { "code": "WHT", "name": "ขาว", "colorCode":"#ffffff"},
-  { "code": "RED", "name": "แดง", "colorCode":"#811918"},
-  { "code": "BLU", "name": "ฟ้า" , "colorCode":"#0f4c7a"},
-  { "code": "GRN", "name": "เขียว" , "colorCode":"#1da149"},
-  { "code": "BLK", "name": "ดำ" , "colorCode":"#542d6c"},
-  { "code": "N", "name": "ไม่มี" , "colorCode":""}
-]

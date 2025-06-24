@@ -48,9 +48,9 @@ async function fetchDataMap(url, errorContext = 'data') {
  */
 async function fetchCardsData() {
     try {
-        const response = await fetch('database/cards.json');
+        const response = await fetch('cards.json');
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status} from database/card.json`);
+            throw new Error(`HTTP error! status: ${response.status} from card.json`);
         }
         return await response.json();
     } catch (error) {
@@ -178,15 +178,15 @@ async function main() {
     [allCardsData, typeMap, costMap, gemMap, symbolMap,
         cardColorMap, gemColorMap, isOnlyOneMap, rarityMap, powerMap] = await Promise.all([
             fetchCardsData(),
-            fetchDataMap('database/type.json', 'type data'),
-            fetchDataMap('database/cost.json', 'cost data'),
-            fetchDataMap('database/gem.json', 'gem data'),
-            fetchDataMap('database/symbol.json', 'symbol data'),
-            fetchDataMap('database/card_color.json', 'card color data'),
-            fetchDataMap('database/gem_color.json', 'gem color data'),
-            fetchDataMap('database/is_only_one.json', 'is only one data'),
-            fetchDataMap('database/rarity.json', 'rarity data'),
-            fetchDataMap('database/power.json', 'power data')
+            fetchDataMap('type.json', 'type data'),
+            fetchDataMap('cost.json', 'cost data'),
+            fetchDataMap('gem.json', 'gem data'),
+            fetchDataMap('symbol.json', 'symbol data'),
+            fetchDataMap('card_color.json', 'card color data'),
+            fetchDataMap('gem_color.json', 'gem color data'),
+            fetchDataMap('is_only_one.json', 'is only one data'),
+            fetchDataMap('rarity.json', 'rarity data'),
+            fetchDataMap('power.json', 'power data')
         ]);
 
     if (allCardsData.length > 0) {
@@ -205,7 +205,7 @@ async function main() {
         applyFilters(); // Call applyFilters to display all cards initially
         console.log('Cards and filters initialized successfully.');
     } else {
-        console.warn('No card data was loaded. Please check "database/card.json" and your network.');
+        console.warn('No card data was loaded. Please check "card.json" and your network.');
     }
 
     // Add event listeners for instant filtering
