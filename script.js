@@ -74,17 +74,19 @@ function displayCards(cards) {
 
     cards.forEach(card => {
         const cardElement = document.createElement('div');
+        const colorCircle = `<span class="color-dot" style="background-color: ${getColorHex(card.costColor)};"></span>`;
+
         cardElement.classList.add('card');
         cardElement.innerHTML = `
             <h4>${card.name}</h4>
             <img src="${card.image}" alt="${card.name}" class="card-image">
             <p><span class="label">Type:</span> ${getMappedValue(typeMap, card.type)}</p>
             <p><span class="label">Symbol:</span> ${getMappedValue(symbolMap, card.symbol)}</p>
-            <p><span class="label">Cost:</span> ${getMappedValue(costMap, card.cost)} (${getMappedValue(costColorMap, card.costColor)})</p>
-             <p ><span class="label" >Gem:</span> ${getMappedValue(gemMap, card.gem)} </span></p>
-             <p><span class="label">Power:</span> ${getMappedValue(powerMap, card.power)}</p>
-             <p><span class="label">Rarity:</span> ${getMappedValue(rarityMap, card.rarity)}</p>
-             <p><span class="label">Ability:</span> ${card.ability || 'N/A'}</p>
+            <span class="label">Cost:</span><span>${getMappedValue(costMap, card.cost)} ${colorCircle}</span>
+            <p ><span class="label" >Gem:</span> ${getMappedValue(gemMap, card.gem)} </span></p>
+            <p><span class="label">Power:</span> ${getMappedValue(powerMap, card.power)}</p>
+            <p><span class="label">Rarity:</span> ${getMappedValue(rarityMap, card.rarity)}</p>
+            <p><span class="label">Ability:</span> ${card.ability || 'N/A'}</p>
              
         `;
         cardContainer.appendChild(cardElement);
@@ -270,3 +272,17 @@ window.addEventListener("scroll", () => {
 backToTopBtn.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
+
+function getColorHex(code) {
+  // Map your costColor codes to real color values
+  const colorMap = {
+    RED: "#dc3545",
+    BLU: "#0f4c7a",
+    GRN: "#1da149",
+    YELLOW: "#ffc107",
+    WHT: "#ffffff",
+    BLK: "#542d6c",
+    // Add your actual codes from cost_color.json here
+  };
+  return colorMap[code] || "#ccc"; // fallback to gray
+}

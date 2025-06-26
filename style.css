@@ -235,6 +235,16 @@ h1 {
   background: #0056b3;
 }
 
+.color-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-left: 6px;
+  vertical-align: middle;
+  box-shadow: 0 0 2px rgba(0,0,0,0.2);
+}
+
 /* Responsive adjustments */
 @media (max-width: 992px) {
   body {
