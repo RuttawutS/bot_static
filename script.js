@@ -1,6 +1,6 @@
 // Global variables to store fetched data
 let allCardsData = [];
-let typeMap, costMap, gemMap, symbolMap, cardColorMap, gemColorMap, isOnlyOneMap, rarityMap, powerMap;
+let typeMap, costMap, gemMap, symbolMap, isOnlyOneMap, rarityMap, powerMap, soiMap, packMap, costColorMap;
 
 /**
  * Safely retrieves a value from a Map.
@@ -48,7 +48,7 @@ async function fetchDataMap(url, errorContext = 'data') {
  */
 async function fetchCardsData() {
     try {
-        const response = await fetch('cards.json');
+        const response = await fetch('cards_20250627.json');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status} from card.json`);
         }
@@ -76,25 +76,20 @@ function displayCards(cards) {
         const cardElement = document.createElement('div');
         cardElement.classList.add('card');
         cardElement.innerHTML = `
-            <div class="card-inner-content" >
-                <div class="row">
-                    <h3>${card.name}</h3>
-                    <h3> ${getMappedValue(isOnlyOneMap, card.isOnlyOne) == "มีได้เพียงใบเดียว" ? "#1" : "" }</h3>
-                </div>
-                
-                <p><span class="label">Type:</span> ${getMappedValue(typeMap, card.type)}</p>
-                <p><span class="label">Cost:</span> ${getMappedValue(costMap, card.cost)}</p>
-                <p><span class="label">Symbol:</span> ${getMappedValue(symbolMap, card.symbol)}</p>
-                <p><span class="label">Card Color:</span> ${getMappedValue(cardColorMap, card.cardColor)}</p>
-                <p ><span class="label" >Gem:</span> ${getMappedValue(gemMap, card.gem)} (${getMappedValue(gemColorMap, card.gemColor)}) </span></p>
-                <p><span class="label">Is Only One:</span> ${getMappedValue(isOnlyOneMap, card.isOnlyOne)}</p>
-                <p><span class="label">Power:</span> ${getMappedValue(powerMap, card.power)}</p>
-                <p><span class="label">Rarity:</span> ${getMappedValue(rarityMap, card.rarity)}</p>
-                <p><span class="label">Ability:</span> ${card.ability_text || 'N/A'}</p>
-            </div>
+            <h4>${card.name}</h4>
+            <img src="${card.image}" alt="${card.name}" class="card-image">
+            <p><span class="label">Type:</span> ${getMappedValue(typeMap, card.type)}</p>
+            <p><span class="label">Symbol:</span> ${getMappedValue(symbolMap, card.symbol)}</p>
+            <p><span class="label">Cost:</span> ${getMappedValue(costMap, card.cost)} (${getMappedValue(costColorMap, card.costColor)})</p>
+             <p ><span class="label" >Gem:</span> ${getMappedValue(gemMap, card.gem)} </span></p>
+             <p><span class="label">Power:</span> ${getMappedValue(powerMap, card.power)}</p>
+             <p><span class="label">Rarity:</span> ${getMappedValue(rarityMap, card.rarity)}</p>
+             <p><span class="label">Ability:</span> ${card.ability || 'N/A'}</p>
+             
         `;
         cardContainer.appendChild(cardElement);
     });
+
 }
 
 /**
@@ -122,47 +117,66 @@ function populateDropdown(dropdownId, dataMap) {
 function applyFilters() {
     let filteredCards = [...allCardsData]; // Start with all cards
 
-    const typeFilter = document.getElementById('typeFilter').value;
-    const symbolFilter = document.getElementById('symbolFilter').value;
-    const costFilter = document.getElementById('costFilter').value;
-    const cardColorFilter = document.getElementById('cardColorFilter').value;
-    const gemFilter = document.getElementById('gemFilter').value;
-    const gemColorFilter = document.getElementById('gemColorFilter').value;
-    const powerFilter = document.getElementById('powerFilter').value;
-    const rarityFilter = document.getElementById('rarityFilter').value;
-    const isOnlyOneFilter = document.getElementById('isOnlyOneFilter').value;
-    const searchInput = document.getElementById('searchInput').value.toLowerCase(); // Get text search input
+    const nameSearchInput = document.getElementById('nameSearchInput').value.toLowerCase(); // Get text search input
+    const abilitySearchInput = document.getElementById('abilitySearchInput').value.toLowerCase(); // Get text search input
 
+    const typeFilter = document.getElementById('typeFilter').value;
+    const costFilter = document.getElementById('costFilter').value;
+    const gemFilter = document.getElementById('gemFilter').value;
+    const powerFilter = document.getElementById('powerFilter').value;
+    const symbolFilter = document.getElementById('symbolFilter').value;
+    const costColorFilter = document.getElementById('costColorFilter').value;
+    const isOnlyOneFilter = document.getElementById('isOnlyOneFilter').value;
+    const soiFilter = document.getElementById('soiFilter').value;
+    const packFilter = document.getElementById('packFilter').value;
+    const rarityFilter = document.getElementById('rarityFilter').value;
+    
     // Apply filters sequentially
+     if (nameSearchInput) {
+        filteredCards = filteredCards.filter(card =>  card.name.toLowerCase().includes(nameSearchInput));
+    }
+
     if (typeFilter) {
         filteredCards = filteredCards.filter(card => card.type === typeFilter);
     }
-    if (symbolFilter) {
-        filteredCards = filteredCards.filter(card => card.symbol === symbolFilter);
-    }
+    
     if (costFilter) {
         filteredCards = filteredCards.filter(card => card.cost === costFilter);
     }
-    if (cardColorFilter) {
-        filteredCards = filteredCards.filter(card => card.cardColor === cardColorFilter);
-    }
+
     if (gemFilter) {
         filteredCards = filteredCards.filter(card => card.gem === gemFilter);
     }
-    if (gemColorFilter) {
-        filteredCards = filteredCards.filter(card => card.gemColor === gemColorFilter);
-    }
+
     if (powerFilter) {
         filteredCards = filteredCards.filter(card => card.power === powerFilter);
     }
-    if (rarityFilter) {
-        filteredCards = filteredCards.filter(card => card.rarity === rarityFilter);
+
+    if (symbolFilter) {
+        filteredCards = filteredCards.filter(card => card.symbol === symbolFilter);
     }
+
+    if (costColorFilter) {
+        filteredCards = filteredCards.filter(card => card.costColor === costColorFilter);
+    }
+   
     if (isOnlyOneFilter) {
         filteredCards = filteredCards.filter(card => card.isOnlyOne === isOnlyOneFilter);
     }
-    if (searchInput) {
-        filteredCards = filteredCards.filter(card =>  card.name.toLowerCase().includes(searchInput));
+    if (soiFilter) {
+        filteredCards = filteredCards.filter(card => card.soi === soiFilter);
+    }
+
+    if (packFilter) {
+        filteredCards = filteredCards.filter(card => card.pack === packFilter);
+    }
+    
+    if (rarityFilter) {
+        filteredCards = filteredCards.filter(card => card.rarity === rarityFilter);
+    }
+    
+    if (abilitySearchInput) {
+        filteredCards = filteredCards.filter(card => card.ability && card.ability.toLowerCase().includes(abilitySearchInput));
     }
 
     displayCards(filteredCards);
@@ -175,31 +189,33 @@ async function main() {
     console.log('Starting Battle of Talingchan Card Viewer initialization...');
 
     // Fetch all data concurrently using the generic fetchDataMap
-    [allCardsData, typeMap, costMap, gemMap, symbolMap,
-        cardColorMap, gemColorMap, isOnlyOneMap, rarityMap, powerMap] = await Promise.all([
+    [allCardsData, typeMap, symbolMap, costMap, gemMap,  isOnlyOneMap, rarityMap, powerMap, soiMap, packMap, costColorMap] = await Promise.all([
             fetchCardsData(),
             fetchDataMap('type.json', 'type data'),
+            fetchDataMap('symbol.json', 'symbol data'),
             fetchDataMap('cost.json', 'cost data'),
             fetchDataMap('gem.json', 'gem data'),
-            fetchDataMap('symbol.json', 'symbol data'),
-            fetchDataMap('card_color.json', 'card color data'),
-            fetchDataMap('gem_color.json', 'gem color data'),
             fetchDataMap('is_only_one.json', 'is only one data'),
             fetchDataMap('rarity.json', 'rarity data'),
-            fetchDataMap('power.json', 'power data')
+            fetchDataMap('power.json', 'power data'),
+            fetchDataMap('soi.json', 'soi data'),
+            fetchDataMap('pack.json', 'pack data') ,
+            fetchDataMap('cost_color.json', 'cost color data')
         ]);
 
     if (allCardsData.length > 0) {
         // Populate dropdowns with data
         populateDropdown('typeFilter', typeMap);
-        populateDropdown('symbolFilter', symbolMap);
         populateDropdown('costFilter', costMap);
-        populateDropdown('cardColorFilter', cardColorMap);
         populateDropdown('gemFilter', gemMap);
-        populateDropdown('gemColorFilter', gemColorMap);
         populateDropdown('powerFilter', powerMap);
-        populateDropdown('rarityFilter', rarityMap);
+        populateDropdown('symbolFilter', symbolMap);
+        populateDropdown('costColorFilter', costColorMap);
         populateDropdown('isOnlyOneFilter', isOnlyOneMap);
+        populateDropdown('rarityFilter', rarityMap);
+        populateDropdown('soiFilter', soiMap);
+        populateDropdown('packFilter', packMap);
+        
 
         // Initial display of all cards
         applyFilters(); // Call applyFilters to display all cards initially
@@ -212,13 +228,17 @@ async function main() {
     document.getElementById('typeFilter').addEventListener('change', applyFilters);
     document.getElementById('symbolFilter').addEventListener('change', applyFilters);
     document.getElementById('costFilter').addEventListener('change', applyFilters);
-    document.getElementById('cardColorFilter').addEventListener('change', applyFilters);
+    document.getElementById('costColorFilter').addEventListener('change', applyFilters);
     document.getElementById('gemFilter').addEventListener('change', applyFilters);
-    document.getElementById('gemColorFilter').addEventListener('change', applyFilters);
     document.getElementById('powerFilter').addEventListener('change', applyFilters);
     document.getElementById('rarityFilter').addEventListener('change', applyFilters);
     document.getElementById('isOnlyOneFilter').addEventListener('change', applyFilters);
-    document.getElementById('searchInput').addEventListener('input', applyFilters);
+    document.getElementById('soiFilter').addEventListener('change', applyFilters);
+    document.getElementById('packFilter').addEventListener('change', applyFilters);
+    document.getElementById('nameSearchInput').addEventListener('input', applyFilters);
+    document.getElementById('abilitySearchInput').addEventListener('input', applyFilters);
+    
+
 
     // Add event listener for the Reset Filters button
     document.getElementById('resetBtn').addEventListener('click', () => {
@@ -226,16 +246,27 @@ async function main() {
         document.getElementById('typeFilter').value = '';
         document.getElementById('symbolFilter').value = '';
         document.getElementById('costFilter').value = '';
-        document.getElementById('cardColorFilter').value = '';
+        document.getElementById('costColorFilter').value = '';
         document.getElementById('gemFilter').value = '';
-        document.getElementById('gemColorFilter').value = '';
         document.getElementById('powerFilter').value = '';
         document.getElementById('rarityFilter').value = '';
         document.getElementById('isOnlyOneFilter').value = '';
-        document.getElementById('searchInput').value = ''; // Clear search input
+        document.getElementById('nameSearchInput').value = '';
+        document.getElementById('soiFilter').value = '';
+        document.getElementById('packFilter').value = '';
+        document.getElementById('abilitySearchInput').value = ''; // Reset ability search input
         applyFilters(); // Re-apply filters to show all cards
     });
 }
 
 // Run the main function when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', main);
+
+const backToTopBtn = document.getElementById("backToTopBtn");
+window.addEventListener("scroll", () => {
+  backToTopBtn.style.display = window.scrollY > 300 ? "block" : "none";
+});
+
+backToTopBtn.addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});

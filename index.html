@@ -11,7 +11,8 @@
   <aside id="sidebar">
     <div class="sidebar-header">
       <h2>ตัวกรองการ์ด</h2>
-      <input type="text" id="searchInput" placeholder="ค้นหาชื่อการ์ด..." class="text-input">
+      <input type="text" id="nameSearchInput" placeholder="ค้นหาชื่อการ์ด..." class="text-input">
+      <input type="text" id="abilitySearchInput" placeholder="ค้นหาชื่อ ability ..." class="text-input">
     </div>
 
     <div class="filter-group">
@@ -36,9 +37,9 @@
     </div>
 
     <div class="filter-group">
-      <label for="cardColorFilter">Card Color:</label>
-      <select class="select" id="cardColorFilter" data-placeholder="Card Color">
-        <option value="">-- เลือก Card Color --</option>
+      <label for="costColorFilter">Cost Color:</label>
+      <select class="select" id="costColorFilter" data-placeholder="Cost Color">
+        <option value="">-- เลือก Cost Color --</option>
       </select>
     </div>
 
@@ -46,13 +47,6 @@
       <label for="gemFilter">Gem:</label>
       <select class="select" id="gemFilter" data-placeholder="Gem">
         <option value="">-- เลือก Gem --</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label for="gemColorFilter">Gem Color:</label>
-      <select class="select" id="gemColorFilter" data-placeholder="Gem Color">
-        <option value="">-- เลือก Gem Color --</option>
       </select>
     </div>
 
@@ -77,6 +71,20 @@
       </select>
     </div>
 
+    <div class="filter-group">
+      <label for="packFilter">Pack:</label>
+      <select class="select" id="packFilter" data-placeholder="Pack">
+        <option value="">-- เลือก Pack --</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="soiFilter">soi:</label>
+      <select class="select" id="soiFilter" data-placeholder="Soi">
+        <option value="">-- เลือก Soi --</option>
+      </select>
+    </div>
+
     <button id="resetBtn" class="action-button">รีเซ็ตตัวกรอง</button>
   </aside>
 
@@ -84,6 +92,8 @@
     <h1>BOT.DB</h1>
     <div id="card-container"></div>
   </div>
+
+   <button id="backToTopBtn" title="กลับด้านบน">↑</button>
 
   <script src="script.js"></script>
 </body>
