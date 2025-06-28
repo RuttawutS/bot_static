@@ -1,6 +1,30 @@
 
 [
     {
+        "code":"SD01",
+        "name":"Starter Deck 1"
+    },
+    {
+        "code":"SD02",
+        "name":"Starter Deck 2"
+    },
+    {
+        "code":"SD03",
+        "name":"Starter Deck 3"
+    },
+    {
+        "code":"SD04",
+        "name":"Starter Deck 4"
+    },
+    {
+        "code":"SD05",
+        "name":"Starter Deck 5"
+    },
+    {
+        "code":"SD06",
+        "name":"Starter Deck 6"
+    },
+    {
         "code":"BT01",
         "name":"Booster Pack 1"
     },
@@ -25,27 +49,8 @@
         "name":"Booster Pack 6"
     },
     {
-        "code":"SD01",
-        "name":"Starter Deck 1"
-    },
-    {
-        "code":"SD02",
-        "name":"Starter Deck 2"
-    },
-    {
-        "code":"SD03",
-        "name":"Starter Deck 3"
-    },
-    {
-        "code":"SD04",
-        "name":"Starter Deck 4"
-    },
-    {
-        "code":"SD05",
-        "name":"Starter Deck 5"
-    },
-    {
-        "code":"SD06",
-        "name":"Starter Deck 6"
+        "code":"CC",
+        "name":"Community Collection"
     }
+    
 ]

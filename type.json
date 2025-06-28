@@ -1,23 +1,7 @@
 
-[
-    {
-        "code":"A",
-        "name":"Avatar"
-    },
-    {
-        "code":"C",
-        "name":"Construct"
-    },
-    {
-        "code":"L",
-        "name":"Life"
-    },
-    {
-        "code":"M",
-        "name":"Magic"
-    },
-    {
-        "code":"N",
-        "name":"ไม่มี"
-    }
+[ { "code":"A", "name":"Avatar" },
+  { "code":"C", "name":"Construct" },
+  { "code":"L", "name":"Life" },
+  { "code":"M", "name":"Magic" },
+  { "code":"N", "name":"ไม่มี" }
 ]
