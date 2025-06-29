@@ -48,7 +48,7 @@ async function fetchDataMap(url, errorContext = 'data') {
  */
 async function fetchCardsData() {
     try {
-        const response = await fetch('cards_20250627.json');
+        const response = await fetch('database/cards_20250627.json');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status} from card.json`);
         }
@@ -114,13 +114,27 @@ function populateDropdown(dropdownId, dataMap) {
 }
 
 /**
+ * Debounce function to limit how often a function is called.
+ * @param {Function} func The function to debounce.
+ * @param {number} delay The delay in milliseconds.
+ * @returns {Function} The debounced function.
+ */
+function debounce(func, delay) {
+    let timeout;
+    return function(...args) {
+        const context = this;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), delay);
+    };
+}
+
+/**
  * Applies all active filters and updates the displayed cards.
  */
 function applyFilters() {
     let filteredCards = [...allCardsData]; // Start with all cards
 
-    const nameSearchInput = document.getElementById('nameSearchInput').value.toLowerCase(); // Get text search input
-    const abilitySearchInput = document.getElementById('abilitySearchInput').value.toLowerCase(); // Get text search input
+    const searchTerm = document.getElementById('nameSearchInput').value.toLowerCase(); // Get combined text search input
 
     const typeFilter = document.getElementById('typeFilter').value;
     const costFilter = document.getElementById('costFilter').value;
@@ -133,11 +147,15 @@ function applyFilters() {
     const packFilter = document.getElementById('packFilter').value;
     const rarityFilter = document.getElementById('rarityFilter').value;
     
-    // Apply filters sequentially
-     if (nameSearchInput) {
-        filteredCards = filteredCards.filter(card =>  card.name.toLowerCase().includes(nameSearchInput));
+    // Apply combined text search filter
+    if (searchTerm) {
+        filteredCards = filteredCards.filter(card => 
+            (card.name && card.name.toLowerCase().includes(searchTerm)) || 
+            (card.ability && card.ability.toLowerCase().includes(searchTerm))
+        );
     }
 
+    // Apply other filters sequentially
     if (typeFilter) {
         filteredCards = filteredCards.filter(card => card.type === typeFilter);
     }
@@ -177,10 +195,6 @@ function applyFilters() {
         filteredCards = filteredCards.filter(card => card.rarity === rarityFilter);
     }
     
-    if (abilitySearchInput) {
-        filteredCards = filteredCards.filter(card => card.ability && card.ability.toLowerCase().includes(abilitySearchInput));
-    }
-
     displayCards(filteredCards);
 }
 
@@ -193,16 +207,16 @@ async function main() {
     // Fetch all data concurrently using the generic fetchDataMap
     [allCardsData, typeMap, symbolMap, costMap, gemMap,  isOnlyOneMap, rarityMap, powerMap, soiMap, packMap, costColorMap] = await Promise.all([
             fetchCardsData(),
-            fetchDataMap('type.json', 'type data'),
-            fetchDataMap('symbol.json', 'symbol data'),
-            fetchDataMap('cost.json', 'cost data'),
-            fetchDataMap('gem.json', 'gem data'),
-            fetchDataMap('is_only_one.json', 'is only one data'),
-            fetchDataMap('rarity.json', 'rarity data'),
-            fetchDataMap('power.json', 'power data'),
-            fetchDataMap('soi.json', 'soi data'),
-            fetchDataMap('pack.json', 'pack data') ,
-            fetchDataMap('cost_color.json', 'cost color data')
+            fetchDataMap('database/type.json', 'type data'),
+            fetchDataMap('database/symbol.json', 'symbol data'),
+            fetchDataMap('database/cost.json', 'cost data'),
+            fetchDataMap('database/gem.json', 'gem data'),
+            fetchDataMap('database/is_only_one.json', 'is only one data'),
+            fetchDataMap('database/rarity.json', 'rarity data'),
+            fetchDataMap('database/power.json', 'power data'),
+            fetchDataMap('database/soi.json', 'soi data'),
+            fetchDataMap('database/pack.json', 'pack data') ,
+            fetchDataMap('database/cost_color.json', 'cost color data')
         ]);
 
     if (allCardsData.length > 0) {
@@ -237,10 +251,10 @@ async function main() {
     document.getElementById('isOnlyOneFilter').addEventListener('change', applyFilters);
     document.getElementById('soiFilter').addEventListener('change', applyFilters);
     document.getElementById('packFilter').addEventListener('change', applyFilters);
-    document.getElementById('nameSearchInput').addEventListener('input', applyFilters);
-    document.getElementById('abilitySearchInput').addEventListener('input', applyFilters);
     
-
+    // Use debounced function for the combined search input
+    document.getElementById('nameSearchInput').addEventListener('input', debounce(applyFilters, 300));
+    
 
     // Add event listener for the Reset Filters button
     document.getElementById('resetBtn').addEventListener('click', () => {
@@ -253,10 +267,9 @@ async function main() {
         document.getElementById('powerFilter').value = '';
         document.getElementById('rarityFilter').value = '';
         document.getElementById('isOnlyOneFilter').value = '';
-        document.getElementById('nameSearchInput').value = '';
+        document.getElementById('nameSearchInput').value = ''; // Reset combined search input
         document.getElementById('soiFilter').value = '';
         document.getElementById('packFilter').value = '';
-        document.getElementById('abilitySearchInput').value = ''; // Reset ability search input
         applyFilters(); // Re-apply filters to show all cards
     });
 }
