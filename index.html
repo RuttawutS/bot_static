@@ -8,91 +8,95 @@
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <aside id="sidebar">
-    <div class="sidebar-header">
-      <h2>ตัวกรองการ์ด</h2>
-      <input type="text" id="nameSearchInput" placeholder="ค้นหาชื่อการ์ดหรือ Ability..." class="text-input">
-    </div>
-
-    <div class="filter-group">
-      <label for="typeFilter">Type:</label>
-      <select class="select" id="typeFilter" data-placeholder="Type">
-        <option value="">-- เลือก Type --</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label for="symbolFilter">Symbol:</label>
-      <select class="select" id="symbolFilter" data-placeholder="Symbol">
-        <option value="">-- เลือก Symbol --</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label for="costFilter">Cost / Magic Type:</label>
-      <select class="select" id="costFilter" data-placeholder="Cost / Magic Type">
-        <option value="">-- เลือก Cost --</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label for="costColorFilter">Cost Color:</label>
-      <select class="select" id="costColorFilter" data-placeholder="Cost Color">
-        <option value="">-- เลือก Cost Color --</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label for="gemFilter">Gem:</label>
-      <select class="select" id="gemFilter" data-placeholder="Gem">
-        <option value="">-- เลือก Gem --</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label for="powerFilter">Power:</label>
-      <select class="select" id="powerFilter" data-placeholder="Power">
-        <option value="">-- เลือก Power --</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label for="isOnlyOneFilter">Is Only One:</label>
-      <select class="select" id="isOnlyOneFilter" data-placeholder="IsOnlyOne">
-        <option value="">-- เลือก only one --</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label for="rarityFilter">Rarity:</label>
-      <select class="select" id="rarityFilter" data-placeholder="Rarity">
-        <option value="">-- เลือก Rarity --</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label for="packFilter">Pack:</label>
-      <select class="select" id="packFilter" data-placeholder="Pack">
-        <option value="">-- เลือก Pack --</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label for="soiFilter">soi:</label>
-      <select class="select" id="soiFilter" data-placeholder="Soi">
-        <option value="">-- เลือก Soi --</option>
-      </select>
-    </div>
-
-    <button id="resetBtn" class="action-button">รีเซ็ตตัวกรอง</button>
-  </aside>
-
   <div id="main-content">
     <h1>BOT.DB</h1>
     <div id="card-container"></div>
   </div>
 
-   <button id="backToTopBtn" title="กลับด้านบน">↑</button>
+  <button id="openFilterBtn" class="action-button floating-button" title="เปิดตัวกรอง">☰ ตัวกรอง</button>
+
+  <div id="filterModal" class="modal">
+    <div class="modal-content">
+      <span class="close-button">&times;</span>
+      <h2>ตัวกรองการ์ด</h2>
+      <input type="text" id="nameSearchInput" placeholder="ค้นหาชื่อการ์ดหรือ Ability..." class="text-input">
+
+      <div class="filter-group">
+        <label for="typeFilter">Type:</label>
+        <select class="select" id="typeFilter" data-placeholder="Type">
+          <option value="">-- เลือก Type --</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="symbolFilter">Symbol:</label>
+        <select class="select" id="symbolFilter" data-placeholder="Symbol">
+          <option value="">-- เลือก Symbol --</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="costFilter">Cost / Magic Type:</label>
+        <select class="select" id="costFilter" data-placeholder="Cost / Magic Type">
+          <option value="">-- เลือก Cost --</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="costColorFilter">Cost Color:</label>
+        <select class="select" id="costColorFilter" data-placeholder="Cost Color">
+          <option value="">-- เลือก Cost Color --</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="gemFilter">Gem:</label>
+        <select class="select" id="gemFilter" data-placeholder="Gem">
+          <option value="">-- เลือก Gem --</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="powerFilter">Power:</label>
+        <select class="select" id="powerFilter" data-placeholder="Power">
+          <option value="">-- เลือก Power --</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="isOnlyOneFilter">Is Only One:</label>
+        <select class="select" id="isOnlyOneFilter" data-placeholder="IsOnlyOne">
+          <option value="">-- เลือก only one --</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="rarityFilter">Rarity:</label>
+        <select class="select" id="rarityFilter" data-placeholder="Rarity">
+          <option value="">-- เลือก Rarity --</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="packFilter">Pack:</label>
+        <select class="select" id="packFilter" data-placeholder="Pack">
+          <option value="">-- เลือก Pack --</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="soiFilter">soi:</label>
+        <select class="select" id="soiFilter" data-placeholder="Soi">
+          <option value="">-- เลือก Soi --</option>
+        </select>
+      </div>
+
+      <button id="applyFilterBtn" class="action-button">ใช้ตัวกรอง</button>
+      <button id="resetBtn" class="action-button secondary-button">รีเซ็ตตัวกรอง</button>
+    </div>
+  </div>
+
+  <button id="backToTopBtn" title="กลับด้านบน">↑</button>
 
   <script src="script.js"></script>
 </body>

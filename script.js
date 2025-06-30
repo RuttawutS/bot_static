@@ -2,6 +2,12 @@
 let allCardsData = [];
 let typeMap, costMap, gemMap, symbolMap, isOnlyOneMap, rarityMap, powerMap, soiMap, packMap, costColorMap;
 
+// Modal elements
+const filterModal = document.getElementById('filterModal');
+const openFilterBtn = document.getElementById('openFilterBtn');
+const closeButton = document.querySelector('.close-button');
+const applyFilterButton = document.getElementById('applyFilterBtn'); // New apply button
+
 /**
  * Safely retrieves a value from a Map.
  * If the map or code is not found, it falls back to the code or 'N/A'.
@@ -87,7 +93,7 @@ function displayCards(cards) {
             <p><span class="label">Power:</span> ${getMappedValue(powerMap, card.power)}</p>
             <p><span class="label">Rarity:</span> ${getMappedValue(rarityMap, card.rarity)}</p>
             <p><span class="label">Ability:</span> ${card.ability || 'N/A'}</p>
-             
+
         `;
         cardContainer.appendChild(cardElement);
     });
@@ -146,11 +152,11 @@ function applyFilters() {
     const soiFilter = document.getElementById('soiFilter').value;
     const packFilter = document.getElementById('packFilter').value;
     const rarityFilter = document.getElementById('rarityFilter').value;
-    
+
     // Apply combined text search filter
     if (searchTerm) {
-        filteredCards = filteredCards.filter(card => 
-            (card.name && card.name.toLowerCase().includes(searchTerm)) || 
+        filteredCards = filteredCards.filter(card =>
+            (card.name && card.name.toLowerCase().includes(searchTerm)) ||
             (card.ability && card.ability.toLowerCase().includes(searchTerm))
         );
     }
@@ -159,7 +165,7 @@ function applyFilters() {
     if (typeFilter) {
         filteredCards = filteredCards.filter(card => card.type === typeFilter);
     }
-    
+
     if (costFilter) {
         filteredCards = filteredCards.filter(card => card.cost === costFilter);
     }
@@ -179,7 +185,7 @@ function applyFilters() {
     if (costColorFilter) {
         filteredCards = filteredCards.filter(card => card.costColor === costColorFilter);
     }
-   
+
     if (isOnlyOneFilter) {
         filteredCards = filteredCards.filter(card => card.isOnlyOne === isOnlyOneFilter);
     }
@@ -190,13 +196,31 @@ function applyFilters() {
     if (packFilter) {
         filteredCards = filteredCards.filter(card => card.pack === packFilter);
     }
-    
+
     if (rarityFilter) {
         filteredCards = filteredCards.filter(card => card.rarity === rarityFilter);
     }
-    
+
     displayCards(filteredCards);
 }
+
+/**
+ * Function to reset all filter dropdowns and search input.
+ */
+function resetFilters() {
+    document.getElementById('typeFilter').value = '';
+    document.getElementById('symbolFilter').value = '';
+    document.getElementById('costFilter').value = '';
+    document.getElementById('costColorFilter').value = '';
+    document.getElementById('gemFilter').value = '';
+    document.getElementById('powerFilter').value = '';
+    document.getElementById('rarityFilter').value = '';
+    document.getElementById('isOnlyOneFilter').value = '';
+    document.getElementById('nameSearchInput').value = '';
+    document.getElementById('soiFilter').value = '';
+    document.getElementById('packFilter').value = '';
+}
+
 
 /**
  * Main function to initialize the card viewer.
@@ -205,7 +229,7 @@ async function main() {
     console.log('Starting Battle of Talingchan Card Viewer initialization...');
 
     // Fetch all data concurrently using the generic fetchDataMap
-    [allCardsData, typeMap, symbolMap, costMap, gemMap,  isOnlyOneMap, rarityMap, powerMap, soiMap, packMap, costColorMap] = await Promise.all([
+    [allCardsData, typeMap, symbolMap, costMap, gemMap, isOnlyOneMap, rarityMap, powerMap, soiMap, packMap, costColorMap] = await Promise.all([
             fetchCardsData(),
             fetchDataMap('database/type.json', 'type data'),
             fetchDataMap('database/symbol.json', 'symbol data'),
@@ -231,7 +255,7 @@ async function main() {
         populateDropdown('rarityFilter', rarityMap);
         populateDropdown('soiFilter', soiMap);
         populateDropdown('packFilter', packMap);
-        
+
 
         // Initial display of all cards
         applyFilters(); // Call applyFilters to display all cards initially
@@ -240,38 +264,36 @@ async function main() {
         console.warn('No card data was loaded. Please check "card.json" and your network.');
     }
 
-    // Add event listeners for instant filtering
-    document.getElementById('typeFilter').addEventListener('change', applyFilters);
-    document.getElementById('symbolFilter').addEventListener('change', applyFilters);
-    document.getElementById('costFilter').addEventListener('change', applyFilters);
-    document.getElementById('costColorFilter').addEventListener('change', applyFilters);
-    document.getElementById('gemFilter').addEventListener('change', applyFilters);
-    document.getElementById('powerFilter').addEventListener('change', applyFilters);
-    document.getElementById('rarityFilter').addEventListener('change', applyFilters);
-    document.getElementById('isOnlyOneFilter').addEventListener('change', applyFilters);
-    document.getElementById('soiFilter').addEventListener('change', applyFilters);
-    document.getElementById('packFilter').addEventListener('change', applyFilters);
-    
-    // Use debounced function for the combined search input
-    document.getElementById('nameSearchInput').addEventListener('input', debounce(applyFilters, 300));
-    
+    // Event listeners for Modal
+    openFilterBtn.addEventListener('click', () => {
+        filterModal.style.display = 'flex'; // ใช้ flex เพื่อจัดกลาง
+    });
+
+    closeButton.addEventListener('click', () => {
+        filterModal.style.display = 'none';
+    });
+
+    // Close modal if user clicks outside of it
+    window.addEventListener('click', (event) => {
+        if (event.target === filterModal) {
+            filterModal.style.display = 'none';
+        }
+    });
+
+    // Event listener for the new "Apply Filters" button inside the modal
+    applyFilterButton.addEventListener('click', () => {
+        applyFilters();
+        filterModal.style.display = 'none'; // Close modal after applying filters
+    });
 
     // Add event listener for the Reset Filters button
     document.getElementById('resetBtn').addEventListener('click', () => {
-        // Reset all filter dropdowns
-        document.getElementById('typeFilter').value = '';
-        document.getElementById('symbolFilter').value = '';
-        document.getElementById('costFilter').value = '';
-        document.getElementById('costColorFilter').value = '';
-        document.getElementById('gemFilter').value = '';
-        document.getElementById('powerFilter').value = '';
-        document.getElementById('rarityFilter').value = '';
-        document.getElementById('isOnlyOneFilter').value = '';
-        document.getElementById('nameSearchInput').value = ''; // Reset combined search input
-        document.getElementById('soiFilter').value = '';
-        document.getElementById('packFilter').value = '';
+        resetFilters(); // Call the new reset function
         applyFilters(); // Re-apply filters to show all cards
     });
+
+    // Debounced search input, still applies filters when typing
+    document.getElementById('nameSearchInput').addEventListener('input', debounce(applyFilters, 300));
 }
 
 // Run the main function when the DOM is fully loaded
@@ -279,7 +301,7 @@ document.addEventListener('DOMContentLoaded', main);
 
 const backToTopBtn = document.getElementById("backToTopBtn");
 window.addEventListener("scroll", () => {
-  backToTopBtn.style.display = window.scrollY > 300 ? "block" : "none";
+  backToTopBtn.style.display = window.scrollY > 300 ? "flex" : "none"; // เปลี่ยนเป็น flex
 });
 
 backToTopBtn.addEventListener("click", () => {
