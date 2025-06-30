@@ -2,55 +2,59 @@
 [
     {
         "code":"SD01",
-        "name":"Starter Deck 1"
+        "name":"Starter Deck 01"
     },
     {
         "code":"SD02",
-        "name":"Starter Deck 2"
+        "name":"Starter Deck 02"
     },
     {
         "code":"SD03",
-        "name":"Starter Deck 3"
+        "name":"Starter Deck 03"
     },
     {
         "code":"SD04",
-        "name":"Starter Deck 4"
+        "name":"Starter Deck 04"
     },
     {
         "code":"SD05",
-        "name":"Starter Deck 5"
+        "name":"Starter Deck 05"
     },
     {
         "code":"SD06",
-        "name":"Starter Deck 6"
+        "name":"Starter Deck 06"
     },
     {
         "code":"BT01",
-        "name":"Booster Pack 1"
+        "name":"Booster Pack 01"
     },
     {
         "code":"BT02",
-        "name":"Booster Pack 2"
+        "name":"Booster Pack 02"
     },
     {
         "code":"BT03",
-        "name":"Booster Pack 3"
+        "name":"Booster Pack 03"
     },
     {
         "code":"BT04",
-        "name":"Booster Pack 4"
+        "name":"Booster Pack 04"
     },
     {
         "code":"BT05",
-        "name":"Booster Pack 5"
+        "name":"Booster Pack 05"
     },
     {
         "code":"BT06",
-        "name":"Booster Pack 6"
+        "name":"Booster Pack 06"
     },
     {
-        "code":"CC",
-        "name":"Community Collection"
+        "code":"CC01",
+        "name":"Community Collection 01"
+    },
+    {
+        "code":"ODY1",
+        "name":"Odenya 1"
     }
     
 ]
