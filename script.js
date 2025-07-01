@@ -84,6 +84,7 @@ function displayCards(cards) {
 
         cardElement.classList.add('card');
         cardElement.innerHTML = `
+            
             <h4>${card.name}</h4>
             <img src="${card.image}" alt="${card.name}" class="card-image">
             <p><span class="label">Type:</span> ${getMappedValue(typeMap, card.type)}</p>
@@ -93,11 +94,156 @@ function displayCards(cards) {
             <p><span class="label">Power:</span> ${getMappedValue(powerMap, card.power)}</p>
             <p><span class="label">Rarity:</span> ${getMappedValue(rarityMap, card.rarity)}</p>
             <p><span class="label">Ability:</span> ${card.ability || 'N/A'}</p>
-
+            <button class="card-add-btn" title="เพิ่มลง Deck">+</button>
         `;
+
+        // เพิ่ม event ให้ปุ่ม + สำหรับ deck builder
+        const addBtn = cardElement.querySelector('.card-add-btn');
+        addBtn.addEventListener('click', () => addToDeck(card));
+
         cardContainer.appendChild(cardElement);
     });
 
+}
+
+// --- Deck Builder Feature ---
+// เก็บ deck เป็น object { cardId: {card, count} }
+const deck = {};
+
+function addToDeck(card) {
+    const rightSidebar = document.getElementById('right-sidebar');
+    const cardKey = card.name;
+
+    if (deck[cardKey]) {
+        deck[cardKey].count += 1;
+    } else {
+        deck[cardKey] = { card: card, count: 1 };
+    }
+    renderDeck();
+}
+
+function removeFromDeck(cardKey) {
+    if (deck[cardKey]) {
+        deck[cardKey].count -= 1;
+        if (deck[cardKey].count <= 0) {
+            delete deck[cardKey];
+        }
+        renderDeck();
+    }
+}
+
+function renderDeck() {
+    const rightSidebar = document.getElementById('right-sidebar');
+    rightSidebar.innerHTML = ''; // ลบของเก่า
+
+    // กล่องแสดงการ์ดใน deck
+    Object.entries(deck).forEach(([cardKey, entry]) => {
+        const { card, count } = entry;
+        const deckCardBox = document.createElement('div');
+        deckCardBox.className = 'deck-card-box';
+        deckCardBox.innerHTML = `
+            <div class="deck-card-info">
+                <div class="deck-card-name">${card.name} <span class="deck-card-count">x${count}</span></div>
+                <div class="deck-card-type">${getMappedValue(typeMap, card.type)}</div>
+            </div>
+            <button class="deck-card-remove-btn" title="นำออกจาก Deck">−</button>
+        `;
+        // เพิ่ม event ให้ปุ่มลบ
+        const removeBtn = deckCardBox.querySelector('.deck-card-remove-btn');
+        removeBtn.addEventListener('click', () => removeFromDeck(cardKey));
+        rightSidebar.appendChild(deckCardBox);
+    });
+
+    // --- ปุ่มด้านล่างสุดของ right-sidebar ---
+    // Container สำหรับปุ่ม
+    let deckActionBox = document.getElementById('deck-action-box');
+    if (!deckActionBox) {
+        deckActionBox = document.createElement('div');
+        deckActionBox.id = 'deck-action-box';
+        rightSidebar.appendChild(deckActionBox);
+    }
+    deckActionBox.innerHTML = `
+        <button id="showDeckBtn" class="deck-action-btn">ดูการ์ดใน Deck</button>
+        <button id="clearDeckBtn" class="deck-action-btn danger">ลบการ์ดทั้งหมด</button>
+    `;
+
+    // Event: Show Deck Modal
+    document.getElementById('showDeckBtn').onclick = showDeckModal;
+    // Event: Clear Deck
+    document.getElementById('clearDeckBtn').onclick = () => {
+        Object.keys(deck).forEach(key => delete deck[key]);
+        renderDeck();
+    };
+}
+
+// Modal สำหรับแสดงการ์ดใน Deck
+function showDeckModal() {
+    // ลบ modal เดิมถ้ามี
+    let oldModal = document.getElementById('deck-modal');
+    if (oldModal) oldModal.remove();
+
+    // สร้าง modal
+    const modal = document.createElement('div');
+    modal.id = 'deck-modal';
+    modal.className = 'deck-modal';
+
+    // เตรียมข้อมูลแถวของ table
+    let tableRows = '';
+    if (Object.values(deck).length === 0) {
+        tableRows = `<tr><td colspan="3" style="text-align:center;color:#888;">ยังไม่มีการ์ดใน Deck</td></tr>`;
+    } else {
+        tableRows = Object.values(deck).map(entry => `
+            <tr>
+                <td>
+                    <img src="${entry.card.image}" alt="${entry.card.name}">
+                    ${entry.card.name}
+                </td>
+                <td style="text-align:center;">${entry.count}</td>
+            </tr>
+        `).join('');
+    }
+
+    modal.innerHTML = `
+        <div class="deck-modal-content">
+            <span class="deck-modal-close">&times;</span>
+            <h2>การ์ดใน Deck</h2>
+            <table class="deck-modal-table">
+                <thead>
+                    <tr>
+                        <th>ชื่อการ์ด</th>
+                        <th style="text-align:center;">จำนวน</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+            </table>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Add Export Button
+    const exportBtn = document.createElement('button');
+    exportBtn.textContent = 'Export';
+    exportBtn.className = 'deck-action-btn';
+    exportBtn.style.marginTop = '18px';
+    exportBtn.style.padding = '13px';
+    exportBtn.onclick = function () {
+        // Build export string: card1.print:count;card2.print:count;...
+        const exportStr = Object.values(deck)
+            .filter(entry => entry.card.print && entry.count > 0)
+            .map(entry => `${entry.card.print}:${entry.count}`)
+            .join(';');
+        // Copy to clipboard
+        navigator.clipboard.writeText(exportStr).then(() => {
+            alert('copied to your cardboard');
+        });
+    };
+    modal.querySelector('.deck-modal-content').appendChild(exportBtn);
+
+    // ปิด modal
+    modal.querySelector('.deck-modal-close').onclick = () => modal.remove();
+    modal.onclick = e => { if (e.target === modal) modal.remove(); };
 }
 
 /**
@@ -138,6 +284,7 @@ function debounce(func, delay) {
  * Applies all active filters and updates the displayed cards.
  */
 function applyFilters() {
+    console.log('Applying filters...');
     let filteredCards = [...allCardsData]; // Start with all cards
 
     const searchTerm = document.getElementById('nameSearchInput').value.toLowerCase(); // Get combined text search input
@@ -320,4 +467,159 @@ function getColorHex(code) {
     // Add your actual codes from cost_color.json here
   };
   return colorMap[code] || "#ccc"; // fallback to gray
+}
+
+// Improved: Add a single event listener to the sidebar for all input/select changes
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.querySelector('#sidebar .sidebar-content');
+    if (!sidebar) return;
+
+    // Listen for input (for text fields) and change (for selects) in one place
+    sidebar.addEventListener('input', function(e) {
+        if (e.target.matches('input, select')) {
+            filterCards();
+        }
+    });
+    sidebar.addEventListener('change', function(e) {
+        if (e.target.matches('select')) {
+            filterCards();
+        }
+    });
+});
+
+// ตัวอย่างฟังก์ชัน filterCards
+function filterCards() {
+    // Get all filter values from sidebar-content
+    const sidebar = document.querySelector('#sidebar .sidebar-content');
+    const nameSearchInput = sidebar.querySelector('#nameSearchInput');
+    const typeFilter = sidebar.querySelector('#typeFilter');
+    const symbolFilter = sidebar.querySelector('#symbolFilter');
+    const costFilter = sidebar.querySelector('#costFilter');
+    const costColorFilter = sidebar.querySelector('#costColorFilter');
+    const gemFilter = sidebar.querySelector('#gemFilter');
+    const powerFilter = sidebar.querySelector('#powerFilter');
+    const isOnlyOneFilter = sidebar.querySelector('#isOnlyOneFilter');
+    const rarityFilter = sidebar.querySelector('#rarityFilter');
+    const packFilter = sidebar.querySelector('#packFilter');
+    const soiFilter = sidebar.querySelector('#soiFilter');
+
+    // Read values and trim
+    const searchValue = nameSearchInput.value.trim().toLowerCase();
+    const typeValue = typeFilter.value;
+    const symbolValue = symbolFilter.value;
+    const costValue = costFilter.value;
+    const costColorValue = costColorFilter.value;
+    const gemValue = gemFilter.value;
+    const powerValue = powerFilter.value;
+    const isOnlyOneValue = isOnlyOneFilter.value;
+    const rarityValue = rarityFilter.value;
+    const packValue = packFilter.value;
+    const soiValue = soiFilter.value;
+
+    // Filter allCardsData
+    let filtered = allCardsData.filter(card => {
+        // Search by name or ability
+        const matchesSearch = !searchValue ||
+            (card.name && card.name.toLowerCase().includes(searchValue)) ||
+            (card.ability && card.ability.toLowerCase().includes(searchValue));
+
+        // Match each filter if selected
+        const matchesType = !typeValue || card.type === typeValue;
+        const matchesSymbol = !symbolValue || card.symbol === symbolValue;
+        const matchesCost = !costValue || card.cost === costValue;
+        const matchesCostColor = !costColorValue || card.costColor === costColorValue;
+        const matchesGem = !gemValue || card.gem === gemValue;
+        const matchesPower = !powerValue || card.power === powerValue;
+        const matchesIsOnlyOne = !isOnlyOneValue || card.isOnlyOne === isOnlyOneValue;
+        const matchesRarity = !rarityValue || card.rarity === rarityValue;
+        const matchesPack = !packValue || card.pack === packValue;
+        const matchesSoi = !soiValue || card.soi === soiValue;
+
+        return (
+            matchesSearch &&
+            matchesType &&
+            matchesSymbol &&
+            matchesCost &&
+            matchesCostColor &&
+            matchesGem &&
+            matchesPower &&
+            matchesIsOnlyOne &&
+            matchesRarity &&
+            matchesPack &&
+            matchesSoi
+        );
+    });
+
+    displayCards(filtered);
+}
+
+// --- Add Import Button near BackToTopBtn ---
+document.addEventListener('DOMContentLoaded', function () {
+    const backToTopBtn = document.getElementById("backToTopBtn");
+    if (!backToTopBtn) return;
+
+    // Create Import Button
+    const importBtn = document.createElement('button');
+    importBtn.id = 'importDeckBtn';
+    importBtn.textContent = 'Import';
+    importBtn.className = 'deck-action-btn';
+    importBtn.style.position = 'fixed';
+    importBtn.style.bottom = '80px';
+    importBtn.style.right = '32px';
+    importBtn.style.zIndex = '1001';
+
+    document.body.appendChild(importBtn);
+
+    importBtn.addEventListener('click', showImportModal);
+});
+
+// --- Import Modal ---
+function showImportModal() {
+    // Remove old modal if exists
+    let oldModal = document.getElementById('import-modal');
+    if (oldModal) oldModal.remove();
+
+    // Create modal
+    const modal = document.createElement('div');
+    modal.id = 'import-modal';
+    modal.className = 'deck-modal';
+    modal.innerHTML = `
+        <div class="deck-modal-content">
+            <span class="deck-modal-close">&times;</span>
+            <h2>Import Deck</h2>
+            <textarea id="importDeckInput" rows="4" style="width:100%;margin-bottom:16px;" placeholder="เช่น BT01-002:2;BT01-003:1"></textarea>
+            <button id="importDeckSubmit" class="deck-action-btn">นำเข้า Deck</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Close modal
+    modal.querySelector('.deck-modal-close').onclick = () => modal.remove();
+    modal.onclick = e => { if (e.target === modal) modal.remove(); };
+
+    // Handle import
+    document.getElementById('importDeckSubmit').onclick = function () {
+        const input = document.getElementById('importDeckInput').value.trim();
+        if (!input) return;
+        importDeckFromString(input);
+        modal.remove();
+    };
+}
+
+// --- Import Logic ---
+function importDeckFromString(importStr) {
+    // Clear current deck
+    Object.keys(deck).forEach(key => delete deck[key]);
+    // Split by ';'
+    const entries = importStr.split(';').map(s => s.trim()).filter(Boolean);
+    entries.forEach(entry => {
+        const [print, countStr] = entry.split(':');
+        const count = parseInt(countStr, 10) || 1;
+        // Find card by print
+        const card = allCardsData.find(c => c.print === print);
+        if (card && count > 0) {
+            deck[card.name] = { card, count };
+        }
+    });
+    renderDeck();
 }
