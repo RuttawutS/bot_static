@@ -127,7 +127,7 @@ h1 {
 .action-button {
   padding: 12px 25px;
   font-size: 1.1em;
-  background-color: #007bff;
+  background-color: #0678F9;
   color: white;
   border: none;
   border-radius: 8px;
@@ -145,11 +145,11 @@ h1 {
 }
 
 .secondary-button {
-  background-color: #6c757d; /* สีเทาสำหรับปุ่มรีเซ็ต */
+  background-color: #F98706; /* สีเทาสำหรับปุ่มรีเซ็ต */
 }
 
 .secondary-button:hover {
-  background-color: #5a6268;
+  background-color: #F98706;
 }
 
 #card-container {
@@ -180,13 +180,13 @@ h1 {
   top: 18px;
   width: 42px;
   height: 42px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #2193b0 60%, #6dd5ed 100%);
-  color: #fff;
+  border-radius: 20%;
+  background: #ffffff;
+  color: #cccccc;
   border: none;
   font-size: 2em;
   font-weight: bold;
-  box-shadow: 0 2px 8px rgba(33,147,176,0.15);
+  box-shadow: 0 2px 8px rgba(187, 187, 187, 0.3);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -196,7 +196,7 @@ h1 {
 }
 
 .card-add-btn:hover {
-  background: linear-gradient(135deg, #6dd5ed 60%, #2193b0 100%);
+  background: #0678F9;
   transform: scale(1.08);
   color: #fff;
 }
@@ -501,199 +501,98 @@ h1 {
   box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.10);
   margin-bottom: 14px;
   padding: 8px 12px;
-  gap: 12px;
+  gap: 0;
   position: relative;
 }
 
-.deck-card-remove-btn {
+/* ปรับปุ่ม + ให้ชิดขวา */
+.deck-card-add-btn {
   margin-left: auto;
-  background: #e74c3c;
-  color: #fff;
-  border: none;
-  border-radius: 50%;
+  background: #fff;
+  color: #d3d3d3;
+  border: 2px solid #fff;
+  border-radius: 20%;
   width: 32px;
   height: 32px;
   font-size: 1.3em;
   font-weight: bold;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s, transform 0.15s;
-  box-shadow: 0 1px 4px rgba(231,76,60,0.10);
+  transition: background 0.2s, color 0.2s, border 0.2s, transform 0.15s;
+  box-shadow: 0 1px 4px rgba(122, 122, 122, 0.5);
 }
 
+.deck-card-remove-btn {
+  margin-left: 6px; /* เว้นระยะเล็กน้อยระหว่าง - กับ + */
+  background: #fff;
+  color: #d3d3d3;
+  border: 2px solid #fff;
+  border-radius: 20%;
+  width: 32px;
+  height: 32px;
+  font-size: 1.3em;
+  font-weight: bold;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s, border 0.2s, transform 0.15s;
+  box-shadow: 0 1px 4px rgba(122, 122, 122, 0.5);
+}
+
+.deck-card-add-btn:hover{
+  background: #0678F9;
+  color: #fff;
+  border: 2px solid #0678F9;
+  transform: scale(1.08);
+}
 .deck-card-remove-btn:hover {
-  background: #c0392b;
+  background: #F98706;
+  color: #fff;
+  border: 2px solid #F98706;
   transform: scale(1.08);
 }
 
-/* ปุ่ม action ด้านล่าง right-sidebar */
 #deck-action-box {
-  margin-top: 1%;
+  margin-top: auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   padding-top: 18px;
-  background: #f8f9fa;
+  padding-bottom: 50px;
+  background: transparent;
+  align-items: stretch;
 }
 
 .deck-action-btn {
-  padding: 12px 0;
-  font-size: 1.1em;
+  padding: 13px 0;
+  font-size: 1.08em;
   border: none;
-  border-radius: 8px;
-  background: linear-gradient(90deg, #2193b0 60%, #6dd5ed 100%);
+  border-radius: 5px;
+  background: #2F18E7;
   color: #fff;
   font-weight: bold;
   cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
-  box-shadow: 0 2px 8px rgba(33,147,176,0.08);
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(33,147,176,0.10);
+  letter-spacing: 0.5px;
+  margin-bottom: 0;
+  width: 100%;
 }
 
 .deck-action-btn:hover {
-  background: linear-gradient(90deg, #6dd5ed 60%, #2193b0 100%);
-  transform: scale(1.04);
+  background: #2F18E7;
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 4px 16px rgba(33,147,176,0.18);
 }
 
 .deck-action-btn.danger {
-  background: linear-gradient(90deg, #e74c3c 60%, #f9d423 100%);
+  background: #F98706;
   color: #fff;
 }
 
 .deck-action-btn.danger:hover {
-  background: linear-gradient(90deg, #f9d423 60%, #e74c3c 100%);
-}
-
-/* Deck Modal */
-.deck-modal {
-  position: fixed;
-  z-index: 9999;
-  left: 0; top: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.deck-modal-content {
-  background: #fff;
-  border-radius: 16px;
-  padding: 32px 24px 24px 24px;
-  min-width: 320px;
-  max-width: 95vw;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0 8px 32px rgba(33,147,176,0.18);
-  position: relative;
-}
-
-.deck-modal-close {
-  position: absolute;
-  top: 12px;
-  right: 18px;
-  font-size: 2em;
-  color: #888;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.deck-modal-close:hover {
-  color: #e74c3c;
-}
-
-.deck-modal-list {
-  margin-top: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.deck-modal-card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 8px 14px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-}
-
-.deck-modal-card img {
-  width: 48px;
-  height: 48px;
-  object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-}
-
-.deck-modal-card-name {
-  font-weight: bold;
-  font-size: 1.08em;
-  color: #2193b0;
-}
-
-.deck-modal-card-count {
-  color: #e67e22;
-  font-weight: bold;
-  margin-top: 2px;
-}
-
-.deck-modal-empty {
-  text-align: center;
-  color: #888;
-  padding: 24px 0;
-  font-size: 1.1em;
-}
-
-/* Deck Modal Table */
-.deck-modal-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 18px;
-}
-
-.deck-modal-table th, .deck-modal-table td {
-  padding: 10px 8px;
-  text-align: left;
-  border-bottom: 1px solid #e0e0e0;
-  font-size: 1em;
-}
-
-.deck-modal-table th {
-  background: #f8f9fa;
-  color: #2193b0;
-  font-weight: bold;
-}
-
-.deck-modal-table td {
-  background: #fff;
-  vertical-align: middle;
-}
-
-.deck-modal-table img {
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-  margin-right: 8px;
-  vertical-align: middle;
-}
-
-#importDeckBtn {
-  background: linear-gradient(90deg, #6dd5ed 60%, #2193b0 100%);
-  color: #fff;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
-  padding: 13px 22px;
-  font-size: 1.1em;
-  box-shadow: 0 2px 8px rgba(33,147,176,0.18);
-  cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
-}
-#importDeckBtn:hover {
-  background: linear-gradient(90deg, #2193b0 60%, #6dd5ed 100%);
-  transform: scale(1.04);
+  background: #e47b03;
 }

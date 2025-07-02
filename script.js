@@ -1,3 +1,37 @@
+    // Add event listener for the Reset Filters button in sidebar (if present)
+    const resetBtn = document.getElementById('resetBtn');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            resetFilters();
+            applyFilters();
+        });
+    }
+// --- Simple symmetric encryption/decryption using AES (CryptoJS) ---
+// Requires CryptoJS library. If not present, add via CDN in index.html
+// Key: 'BOTDB'
+
+// Encrypts a string using AES
+function encryptText(plainText) {
+    if (!window.CryptoJS) {
+        alert('CryptoJS library not loaded.');
+        return '';
+    }
+    return CryptoJS.AES.encrypt(plainText, 'BOTDB').toString();
+}
+
+// Decrypts a string using AES
+function decryptText(cipherText) {
+    if (!window.CryptoJS) {
+        alert('CryptoJS library not loaded.');
+        return '';
+    }
+    try {
+        const bytes = CryptoJS.AES.decrypt(cipherText, 'BOTDB');
+        return bytes.toString(CryptoJS.enc.Utf8);
+    } catch (e) {
+        return '';
+    }
+}
 // Global variables to store fetched data
 let allCardsData = [];
 let typeMap, costMap, gemMap, symbolMap, isOnlyOneMap, rarityMap, powerMap, soiMap, packMap, costColorMap;
@@ -54,7 +88,7 @@ async function fetchDataMap(url, errorContext = 'data') {
  */
 async function fetchCardsData() {
     try {
-        const response = await fetch('database/cards_20250627.json');
+        const response = await fetch('database/cards.json');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status} from card.json`);
         }
@@ -136,6 +170,89 @@ function renderDeck() {
     const rightSidebar = document.getElementById('right-sidebar');
     rightSidebar.innerHTML = ''; // ลบของเก่า
 
+    // --- กล่องแสดงผลพิเศษ (สูง 20% ของ right-sidebar) ---
+    let infoBox = document.createElement('div');
+    infoBox.id = 'deck-info-box';
+    infoBox.style.height = '20%';
+    infoBox.style.background = '#eaf6fb';
+    infoBox.style.borderRadius = '10px';
+    infoBox.style.marginBottom = '18px';
+    infoBox.style.display = 'flex';
+    infoBox.style.flexDirection = 'column';
+    infoBox.style.alignItems = 'center';
+    infoBox.style.justifyContent = 'center';
+    infoBox.style.fontWeight = 'bold';
+    infoBox.style.fontSize = '1.1em';
+    infoBox.style.color = '#2193b0';
+
+
+    // --- Input field and submit button for deck import (decrypt) ---
+    // Render only once, always visible under deck-info-box
+    let importBox = document.getElementById('deck-import-box');
+    if (!importBox) {
+        importBox = document.createElement('div');
+        importBox.id = 'deck-import-box';
+        importBox.style.display = 'flex';
+        importBox.style.flexDirection = 'row';
+        importBox.style.gap = '6px';
+        importBox.style.margin = '12px 0 18px 0';
+        importBox.innerHTML = `
+          <input id="deckImportInput" type="text" placeholder="Paste deck code..." style="flex:2; padding:7px 10px; border-radius:6px; border:1px solid #ccc; font-size:1em;">
+          <button id="deckImportBtn" style="flex:1; border-radius:6px; background:#2F18E7; color:#fff; border:none; font-weight:bold; cursor:pointer;">submit</button>
+        `;
+        rightSidebar.appendChild(importBox);
+
+        // Bind import button event (only once)
+        const importBtn = importBox.querySelector('#deckImportBtn');
+        importBtn.onclick = function() {
+            const input = importBox.querySelector('#deckImportInput').value.trim();
+            if (!input) return alert('กรุณาใส่ข้อความ deck ที่เข้ารหัส');
+            let decrypted = decryptText(input);
+            if (!decrypted) return alert('ถอดรหัสไม่สำเร็จ');
+            // Parse format: card1.print:amount,card2.print:amount,...
+            const newDeck = {};
+            decrypted.split(',').forEach(pair => {
+                const [print, amount] = pair.split(':');
+                if (!print || !amount) return;
+                // Find card by print (first match)
+                const card = allCardsData.find(c => c.print === print);
+                if (card) {
+                    newDeck[card.name] = { card, count: parseInt(amount) || 1 };
+                }
+            });
+            // Replace deck
+            Object.keys(deck).forEach(key => delete deck[key]);
+            Object.entries(newDeck).forEach(([k, v]) => deck[k] = v);
+            renderDeck();
+        };
+    }
+
+    // --- สรุปจำนวนการ์ดทั้งหมดและแยกตาม type ---
+    const totalCount = Object.values(deck).reduce((sum, entry) => sum + entry.count, 0);
+    const typeCount = {};
+    Object.values(deck).forEach(entry => {
+        const type = entry.card.type || 'N/A';
+        if (!typeCount[type]) typeCount[type] = 0;
+        typeCount[type] += entry.count;
+    });
+
+    let typeSummary = '';
+    for (const [type, count] of Object.entries(typeCount)) {
+        typeSummary += `<div>${getMappedValue(typeMap, type)}  : <span style="color:#e67e22;">${count}</span></div>`;
+    }
+
+    infoBox.innerHTML = `
+        <div>จำนวนการ์ดใน Deck  : <span style="color:#e67e22;">${totalCount}</span></div>
+        <div style="margin-top:1px; font-weight:normal;">
+            ${typeSummary}
+        </div>
+    `;
+
+
+    rightSidebar.appendChild(infoBox);
+
+   
+
     // กล่องแสดงการ์ดใน deck
     Object.entries(deck).forEach(([cardKey, entry]) => {
         const { card, count } = entry;
@@ -146,105 +263,63 @@ function renderDeck() {
                 <div class="deck-card-name">${card.name} <span class="deck-card-count">x${count}</span></div>
                 <div class="deck-card-type">${getMappedValue(typeMap, card.type)}</div>
             </div>
+            <button class="deck-card-add-btn" title="เพิ่มจำนวนการ์ดใน Deck">+</button>
             <button class="deck-card-remove-btn" title="นำออกจาก Deck">−</button>
         `;
-        // เพิ่ม event ให้ปุ่มลบ
+        // ปุ่มเพิ่ม
+        const addBtn = deckCardBox.querySelector('.deck-card-add-btn');
+        addBtn.addEventListener('click', () => {
+            deck[cardKey].count += 1;
+            renderDeck();
+        });
+        // ปุ่มลบ
         const removeBtn = deckCardBox.querySelector('.deck-card-remove-btn');
         removeBtn.addEventListener('click', () => removeFromDeck(cardKey));
         rightSidebar.appendChild(deckCardBox);
     });
 
     // --- ปุ่มด้านล่างสุดของ right-sidebar ---
-    // Container สำหรับปุ่ม
     let deckActionBox = document.getElementById('deck-action-box');
     if (!deckActionBox) {
         deckActionBox = document.createElement('div');
         deckActionBox.id = 'deck-action-box';
         rightSidebar.appendChild(deckActionBox);
     }
+    // ปุ่มแนวนอน 2 ปุ่ม: share, clear
     deckActionBox.innerHTML = `
-        <button id="showDeckBtn" class="deck-action-btn">ดูการ์ดใน Deck</button>
-        <button id="clearDeckBtn" class="deck-action-btn danger">ลบการ์ดทั้งหมด</button>
+      <div style="display: flex; flex-direction: row; gap: 5px; width: 100%; justify-content: space-between;">
+        <button id="shareDeckBtn" class="deck-action-btn" style="flex:1;">share</button>
+        <button id="clearDeckBtn" class="deck-action-btn danger" style="flex:1;">clear</button>
+      </div>
     `;
 
-    // Event: Show Deck Modal
-    document.getElementById('showDeckBtn').onclick = showDeckModal;
-    // Event: Clear Deck
-    document.getElementById('clearDeckBtn').onclick = () => {
-        Object.keys(deck).forEach(key => delete deck[key]);
-        renderDeck();
-    };
-}
-
-// Modal สำหรับแสดงการ์ดใน Deck
-function showDeckModal() {
-    // ลบ modal เดิมถ้ามี
-    let oldModal = document.getElementById('deck-modal');
-    if (oldModal) oldModal.remove();
-
-    // สร้าง modal
-    const modal = document.createElement('div');
-    modal.id = 'deck-modal';
-    modal.className = 'deck-modal';
-
-    // เตรียมข้อมูลแถวของ table
-    let tableRows = '';
-    if (Object.values(deck).length === 0) {
-        tableRows = `<tr><td colspan="3" style="text-align:center;color:#888;">ยังไม่มีการ์ดใน Deck</td></tr>`;
-    } else {
-        tableRows = Object.values(deck).map(entry => `
-            <tr>
-                <td>
-                    <img src="${entry.card.image}" alt="${entry.card.name}">
-                    ${entry.card.name}
-                </td>
-                <td style="text-align:center;">${entry.count}</td>
-            </tr>
-        `).join('');
+    // ต้อง bind event หลังจาก innerHTML ถูกเซ็ตใหม่
+    const clearDeckBtn = deckActionBox.querySelector('#clearDeckBtn');
+    if (clearDeckBtn) {
+        clearDeckBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            Object.keys(deck).forEach(key => delete deck[key]);
+            renderDeck();
+        };
     }
 
-    modal.innerHTML = `
-        <div class="deck-modal-content">
-            <span class="deck-modal-close">&times;</span>
-            <h2>การ์ดใน Deck</h2>
-            <table class="deck-modal-table">
-                <thead>
-                    <tr>
-                        <th>ชื่อการ์ด</th>
-                        <th style="text-align:center;">จำนวน</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tableRows}
-                </tbody>
-            </table>
-        </div>
-    `;
-    document.body.appendChild(modal);
-
-    // Add Export Button
-    const exportBtn = document.createElement('button');
-    exportBtn.textContent = 'Export';
-    exportBtn.className = 'deck-action-btn';
-    exportBtn.style.marginTop = '18px';
-    exportBtn.style.padding = '13px';
-    exportBtn.onclick = function () {
-        // Build export string: card1.print:count;card2.print:count;...
-        const exportStr = Object.values(deck)
-            .filter(entry => entry.card.print && entry.count > 0)
-            .map(entry => `${entry.card.print}:${entry.count}`)
-            .join(';');
-        // Copy to clipboard
-        navigator.clipboard.writeText(exportStr).then(() => {
+    // --- share button logic ---
+    const shareDeckBtn = deckActionBox.querySelector('#shareDeckBtn');
+    if (shareDeckBtn) {
+        shareDeckBtn.onclick = function () {
+        const deckString = Object.values(deck)
+                .map(entry => `${entry.card.print}:${entry.count}`)
+                .join(',');
+        const encrypted = encryptText(deckString);
+        navigator.clipboard.writeText(encrypted).then(() => {
             alert('copied to your cardboard');
         });
     };
-    modal.querySelector('.deck-modal-content').appendChild(exportBtn);
 
-    // ปิด modal
-    modal.querySelector('.deck-modal-close').onclick = () => modal.remove();
-    modal.onclick = e => { if (e.target === modal) modal.remove(); };
+    }
 }
+
 
 /**
  * Populates a dropdown select element with options from a Map.
@@ -403,9 +478,9 @@ async function main() {
         populateDropdown('soiFilter', soiMap);
         populateDropdown('packFilter', packMap);
 
-
         // Initial display of all cards
         applyFilters(); // Call applyFilters to display all cards initially
+        renderDeck(); // Always show deck import box and deck info on first load
         console.log('Cards and filters initialized successfully.');
     } else {
         console.warn('No card data was loaded. Please check "card.json" and your network.');
@@ -427,20 +502,28 @@ async function main() {
         }
     });
 
-    // Event listener for the new "Apply Filters" button inside the modal
-    applyFilterButton.addEventListener('click', () => {
-        applyFilters();
-        filterModal.style.display = 'none'; // Close modal after applying filters
-    });
+    // Event listener for the "search" button in sidebar
+    const applyFilterBtn = document.getElementById('applyFilterBtn');
+    if (applyFilterBtn) {
+        applyFilterBtn.addEventListener('click', () => {
+            applyFilters();
+        });
+    }
 
-    // Add event listener for the Reset Filters button
-    document.getElementById('resetBtn').addEventListener('click', () => {
-        resetFilters(); // Call the new reset function
-        applyFilters(); // Re-apply filters to show all cards
-    });
+    // Event listener for the Reset Filters button in sidebar
+    const resetBtn = document.getElementById('resetBtn');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            resetFilters();
+            applyFilters();
+        });
+    }
 
     // Debounced search input, still applies filters when typing
-    document.getElementById('nameSearchInput').addEventListener('input', debounce(applyFilters, 300));
+    const nameSearchInput = document.getElementById('nameSearchInput');
+    if (nameSearchInput) {
+        nameSearchInput.addEventListener('input', debounce(applyFilters, 300));
+    }
 }
 
 // Run the main function when the DOM is fully loaded
@@ -553,73 +636,3 @@ function filterCards() {
     displayCards(filtered);
 }
 
-// --- Add Import Button near BackToTopBtn ---
-document.addEventListener('DOMContentLoaded', function () {
-    const backToTopBtn = document.getElementById("backToTopBtn");
-    if (!backToTopBtn) return;
-
-    // Create Import Button
-    const importBtn = document.createElement('button');
-    importBtn.id = 'importDeckBtn';
-    importBtn.textContent = 'Import';
-    importBtn.className = 'deck-action-btn';
-    importBtn.style.position = 'fixed';
-    importBtn.style.bottom = '80px';
-    importBtn.style.right = '32px';
-    importBtn.style.zIndex = '1001';
-
-    document.body.appendChild(importBtn);
-
-    importBtn.addEventListener('click', showImportModal);
-});
-
-// --- Import Modal ---
-function showImportModal() {
-    // Remove old modal if exists
-    let oldModal = document.getElementById('import-modal');
-    if (oldModal) oldModal.remove();
-
-    // Create modal
-    const modal = document.createElement('div');
-    modal.id = 'import-modal';
-    modal.className = 'deck-modal';
-    modal.innerHTML = `
-        <div class="deck-modal-content">
-            <span class="deck-modal-close">&times;</span>
-            <h2>Import Deck</h2>
-            <textarea id="importDeckInput" rows="4" style="width:100%;margin-bottom:16px;" placeholder="เช่น BT01-002:2;BT01-003:1"></textarea>
-            <button id="importDeckSubmit" class="deck-action-btn">นำเข้า Deck</button>
-        </div>
-    `;
-    document.body.appendChild(modal);
-
-    // Close modal
-    modal.querySelector('.deck-modal-close').onclick = () => modal.remove();
-    modal.onclick = e => { if (e.target === modal) modal.remove(); };
-
-    // Handle import
-    document.getElementById('importDeckSubmit').onclick = function () {
-        const input = document.getElementById('importDeckInput').value.trim();
-        if (!input) return;
-        importDeckFromString(input);
-        modal.remove();
-    };
-}
-
-// --- Import Logic ---
-function importDeckFromString(importStr) {
-    // Clear current deck
-    Object.keys(deck).forEach(key => delete deck[key]);
-    // Split by ';'
-    const entries = importStr.split(';').map(s => s.trim()).filter(Boolean);
-    entries.forEach(entry => {
-        const [print, countStr] = entry.split(':');
-        const count = parseInt(countStr, 10) || 1;
-        // Find card by print
-        const card = allCardsData.find(c => c.print === print);
-        if (card && count > 0) {
-            deck[card.name] = { card, count };
-        }
-    });
-    renderDeck();
-}
