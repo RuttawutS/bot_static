@@ -1,4 +1,4 @@
-    // Add event listener for the Reset Filters button in sidebar (if present)
+// Add event listener for the Reset Filters button in sidebar (if present)
     const resetBtn = document.getElementById('resetBtn');
     if (resetBtn) {
         resetBtn.addEventListener('click', () => {
@@ -115,26 +115,43 @@ function displayCards(cards) {
     cards.forEach(card => {
         const cardElement = document.createElement('div');
         const colorCircle = `<span class="color-dot" style="background-color: ${getColorHex(card.costColor)};"></span>`;
-
         cardElement.classList.add('card');
+        // Prepare rarity HTML as spans with data-index
+        let rarityHtml = '';
+        if (Array.isArray(card.rarity)) {
+            rarityHtml = card.rarity.map((r, i) => `<span class="rarity-span rarity-box" data-index="${i}" style="display:inline-block;padding:2px 8px;margin:0 2px;border-radius:6px;background:#f3f3f3;border:1px solid #bbb;cursor:pointer;min-width:40px;text-align:center;">${getMappedValue(rarityMap, r)}</span>`).join(' ');
+        } else {
+            rarityHtml = `<span class="rarity-span rarity-box" data-index="0" style="display:inline-block;padding:2px 8px;margin:0 2px;border-radius:6px;background:#f3f3f3;border:1px solid #bbb;min-width:40px;text-align:center;">${getMappedValue(rarityMap, card.rarity)}</span>`;
+        }
         cardElement.innerHTML = `
-            
             <h4>${card.name}</h4>
-            <img src="${card.image}" alt="${card.name}" class="card-image">
+            <img src="${Array.isArray(card.image) ? card.image[0] : card.image}" alt="${card.name}" class="card-image">
             <p><span class="label">Type:</span> ${getMappedValue(typeMap, card.type)}</p>
             <p><span class="label">Symbol:</span> ${getMappedValue(symbolMap, card.symbol)}</p>
             <span class="label">Cost:</span><span>${getMappedValue(costMap, card.cost)} ${colorCircle}</span>
             <p ><span class="label" >Gem:</span> ${getMappedValue(gemMap, card.gem)} </span></p>
             <p><span class="label">Power:</span> ${getMappedValue(powerMap, card.power)}</p>
-            <p><span class="label">Rarity:</span> ${getMappedValue(rarityMap, card.rarity)}</p>
+            <p><span class="label">Rarity:</span> ${rarityHtml}</p>
             <p><span class="label">Ability:</span> ${card.ability || 'N/A'}</p>
             <button class="card-add-btn" title="เพิ่มลง Deck">+</button>
         `;
-
+        // Hover logic for rarity
+        const imgEl = cardElement.querySelector('img.card-image');
+        const raritySpans = cardElement.querySelectorAll('.rarity-span');
+        if (imgEl && Array.isArray(card.image) && card.image.length > 1) {
+            raritySpans.forEach(span => {
+                span.addEventListener('mouseenter', function() {
+                    const idx = parseInt(this.dataset.index);
+                    if (card.image[idx]) imgEl.src = card.image[idx];
+                });
+                span.addEventListener('mouseleave', function() {
+                    imgEl.src = card.image[0];
+                });
+            });
+        }
         // เพิ่ม event ให้ปุ่ม + สำหรับ deck builder
         const addBtn = cardElement.querySelector('.card-add-btn');
         addBtn.addEventListener('click', () => addToDeck(card));
-
         cardContainer.appendChild(cardElement);
     });
 
@@ -464,6 +481,40 @@ async function main() {
             fetchDataMap('database/pack.json', 'pack data') ,
             fetchDataMap('database/cost_color.json', 'cost color data')
         ]);
+
+    /**
+     * Group cards by name, keeping the first card's data and collecting all images and rarities as arrays.
+     * @param {Array<Object>} cards - The array of card objects to group.
+     * @returns {Array<Object>} - The grouped card objects.
+     */
+    function groupCardsByName(cards) {
+        const grouped = new Map();
+        cards.forEach(card => {
+            if (!card.name) return;
+            if (!grouped.has(card.name)) {
+                // Clone the card object to avoid mutating the original
+                grouped.set(card.name, {
+                    ...card,
+                    image: [card.image],
+                    rarity: [card.rarity]
+                });
+            } else {
+                const group = grouped.get(card.name);
+                // Add image if not already present
+                if (card.image && !group.image.includes(card.image)) {
+                    group.image.push(card.image);
+                }
+                // Add rarity if not already present
+                if (card.rarity && !group.rarity.includes(card.rarity)) {
+                    group.rarity.push(card.rarity);
+                }
+            }
+        });
+        return Array.from(grouped.values());
+    }
+
+    // Group cards by name and use the grouped data
+    allCardsData = groupCardsByName(allCardsData);
 
     if (allCardsData.length > 0) {
         // Populate dropdowns with data
