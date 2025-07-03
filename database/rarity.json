@@ -1,6 +1,6 @@
 [
   { "code": "CBR", "name": "Card Board Rare" },
-  { "code": "COM", "name": "Common" },
+  { "code": "C", "name": "Common" },
   { "code": "CMP", "name": "Common Promo" },
   { "code": "PPR", "name": "Paper Rare" },
   { "code": "RAR", "name": "Rare" },
