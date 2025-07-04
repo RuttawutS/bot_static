@@ -164,7 +164,37 @@ const deck = {};
 function addToDeck(card) {
     const rightSidebar = document.getElementById('right-sidebar');
     const cardKey = card.name;
-
+    // --- เงื่อนไข deck ---
+    // 1. card.isOnlyOne มีได้เพียง 1 ใบ
+    if (card.isOnlyOne === 'Y' && deck[cardKey] && deck[cardKey].count >= 1) {
+        alert('การ์ดนี้เป็นแบบ #1 ใส่ได้เพียง 1 ใบในเด็ค');
+        return;
+    }
+    // 2. card.name ซ้ำกันได้ 4 ใบ (ยกเว้น type L)
+    if (card.type !== 'L' && deck[cardKey] && deck[cardKey].count >= 4) {
+        alert('การ์ดนี้ใส่ได้สูงสุด 4 ใบในเด็ค');
+        return;
+    }
+    // 3. card.type = "L" มีได้ 5 ใบใน deck และ card.name ห้ามซ้ำกัน
+    if (card.type === 'L') {
+        // นับจำนวน type L ใน deck
+        const lCount = Object.values(deck).filter(entry => entry.card.type === 'L').length;
+        if (!deck[cardKey] && lCount >= 5) {
+            alert('การ์ดประเภท Life ใส่ได้สูงสุด 5 ใบในเด็ค และห้ามซ้ำกัน');
+            return;
+        }
+        if (deck[cardKey]) {
+            alert('การ์ดประเภท Life ห้ามซ้ำกันในเด็ค');
+            return;
+        }
+    }
+    // 4. จำนวน card ทั้งหมดใน deck มีได้ 50 ใบ
+    const totalCount = Object.values(deck).reduce((sum, entry) => sum + entry.count, 0);
+    if (totalCount >= 50) {
+        alert('เด็คมีการ์ดครบ 50 ใบแล้ว');
+        return;
+    }
+    // --- เพิ่มการ์ด ---
     if (deck[cardKey]) {
         deck[cardKey].count += 1;
     } else {
@@ -259,7 +289,7 @@ function renderDeck() {
     }
 
     infoBox.innerHTML = `
-        <div>จำนวนการ์ดใน Deck  : <span style="color:#e67e22;">${totalCount}</span></div>
+        <div>จำนวนการ์ดใน Deck  : <span style="color:#e67e22;">${totalCount}</span> /50</div>
         <div style="margin-top:1px; font-weight:normal;">
             ${typeSummary}
         </div>
@@ -268,17 +298,55 @@ function renderDeck() {
 
     rightSidebar.appendChild(infoBox);
 
-   
+    // --- กล่อง scroll สำหรับแสดง deck-card-box ---
+    let deckScrollBox = document.getElementById('deck-scroll-box');
+    if (!deckScrollBox) {
+        deckScrollBox = document.createElement('div');
+        deckScrollBox.id = 'deck-scroll-box';
+        deckScrollBox.style.flex = '1 1 auto';
+        deckScrollBox.style.overflowY = 'auto';
+        deckScrollBox.style.maxHeight = '1080px';
+        deckScrollBox.style.marginBottom = '12px';
+        deckScrollBox.style.paddingRight = '4px';
+        rightSidebar.appendChild(deckScrollBox);
+    } else {
+        deckScrollBox.innerHTML = '';
+    }
 
-    // กล่องแสดงการ์ดใน deck
-    Object.entries(deck).forEach(([cardKey, entry]) => {
+    // --- จัดเรียง deck ตาม priority ที่กำหนด ---
+    const deckEntries = Object.entries(deck);
+    deckEntries.sort((a, b) => {
+        const getPriority = (entry) => {
+            const card = entry[1].card;
+            if (card.isOnlyOne === "Y") return 0;
+            if (card.type === "A") return 1;
+            if (card.type === "M") return 2;
+            if (card.type === "C") return 3;
+            if (card.type === "L") return 4;
+            return 5;
+        };
+        return getPriority(a) - getPriority(b);
+    });
+
+    // กล่องแสดงการ์ดใน deck (เรียงตาม priority) ใน deckScrollBox
+    deckEntries.forEach(([cardKey, entry]) => {
         const { card, count } = entry;
         const deckCardBox = document.createElement('div');
         deckCardBox.className = 'deck-card-box';
+        let onlyOneText = '';
+        if (card.isOnlyOne === 'Y') {
+            onlyOneText = ' <span style="color:#dc3545;font-weight:bold;">#1</span>';
+        }
+        // กำหนดสีของ type
+        let typeColor = '';
+        if (card.type === 'A') typeColor = '#dc3545';
+        else if (card.type === 'M') typeColor = '#036ba8';
+        else if (card.type === 'C') typeColor = '#f6cf0f';
+        else if (card.type === 'L') typeColor = '#373535';
         deckCardBox.innerHTML = `
             <div class="deck-card-info">
                 <div class="deck-card-name">${card.name} <span class="deck-card-count">x${count}</span></div>
-                <div class="deck-card-type">${getMappedValue(typeMap, card.type)}</div>
+                <div class="deck-card-type" style="color:${typeColor};">${getMappedValue(typeMap, card.type)}${onlyOneText}</div>
             </div>
             <button class="deck-card-add-btn" title="เพิ่มจำนวนการ์ดใน Deck">+</button>
             <button class="deck-card-remove-btn" title="นำออกจาก Deck">−</button>
@@ -292,7 +360,7 @@ function renderDeck() {
         // ปุ่มลบ
         const removeBtn = deckCardBox.querySelector('.deck-card-remove-btn');
         removeBtn.addEventListener('click', () => removeFromDeck(cardKey));
-        rightSidebar.appendChild(deckCardBox);
+        deckScrollBox.appendChild(deckCardBox);
     });
 
     // --- ปุ่มด้านล่างสุดของ right-sidebar ---
